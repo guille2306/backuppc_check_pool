@@ -1,0 +1,57 @@
+#!/bin/bash
+
+# Copyright (C) 2020 Guillermo Rozas.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program (see the COPYING file). If not, see
+# https://www.gnu.org/licenses/.
+
+dir_file="last_check_dir"
+dir_num=$(cat "$last_check_dir")
+#echo "$dir_num"
+
+#for i in 1 2; do
+for i in seq 1 1 4; do
+  dir_num=$(echo "obase=16;ibase=16; $dir_num + 2" | bc)
+  if [ "$dir_num" == "100" ]; then
+    dir_num="00"
+  fi
+  if [ "${#dir_num}" -eq 1 ]; then
+    dir_num="0""$dir_num"
+  fi
+  dir="/mnt/BACKUPPC/cpool/""$(echo $dir_num | tr '[:upper:]' '[:lower:]')"
+  #echo "$dir_num"
+  echo ""
+  date
+  echo "$dir"
+  find "$dir"* -type f -print0 | while read -d $'\0' file; do
+    [ -e "$file" ] || continue
+    filename=$(basename "$file")
+    if [ "$filename" == "LOCK" ] || [ "$filename" == "poolCnt" ]; then
+      continue
+    fi
+    #echo "f: ""$filename"
+    checksum=$(zlib-flate -uncompress < "$file" | md5sum -b | cut -d' ' -f1)
+    #checksum=$(pigz -dc "$file" | md5sum -b | cut -d' ' -f1)
+    #checksum=$(sudo -u backuppc /usr/local/BackupPC/bin/BackupPC_zcat "$file" | md5sum -b | cut -d' ' -f1)
+    #echo "c: ""$checksum"
+    if [ "$checksum" != "$filename" ]; then
+      echo "ZLIB/PIGZ ERROR: ""$filename"" -> ""$checksum"
+      checksum=$(/usr/local/BackupPC/bin/BackupPC_zcat "$file" | md5sum -b | cut -d' ' -f1)
+      if [ "$checksum" != "$filename" ]; then
+        echo "CHECKSUM ERROR: ""$filename"" -> ""$checksum"
+      fi
+    fi
+  done
+  echo "$dir_num" > "$dir_file"
+done
