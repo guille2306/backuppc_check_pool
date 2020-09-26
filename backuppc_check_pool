@@ -16,8 +16,8 @@
 # along with this program (see the COPYING file). If not, see
 # https://www.gnu.org/licenses/.
 
-dir_file="last_check_dir"
-dir_num=$(cat "$last_check_dir")
+dir_file="last_check_dir_file"
+dir_num=$(cat "$dir_file")
 #echo "$dir_num"
 
 #for i in 1 2; do
