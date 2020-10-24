@@ -1,6 +1,6 @@
 # Description
 
-This is a helper Bash script to verify the checksum of files in a [BackupPC V4](https://backuppc.github.io/backuppc/) installation.
+This is a helper Bash script to verify the checksum of files in a [BackupPC V4](https://backuppc.github.io/backuppc/) installation. The latest version of the script can be found at [github.com/guille2306/backuppc_check_pool](https://github.com/guille2306/backuppc_check_pool).
 
 ## The problem
 

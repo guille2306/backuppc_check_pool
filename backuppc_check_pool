@@ -1,6 +1,10 @@
 #!/bin/bash
 
-# Copyright (C) 2020 Guillermo Rozas.
+# This is a helper Bash script to verify the checksum of files in a BackupPC V4
+# installation. The latest version of the script can be found at
+# https://github.com/guille2306/backuppc_check_pool.
+#
+# Copyright (C) 2020 Guillermo Rozas. 
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
