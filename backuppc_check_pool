@@ -31,6 +31,10 @@ dir_file="last_check_dir_file"
 dir_base="base_pool_folder"
 # This is the number of sub-folders the script should check during each run
 dir_run=4
+# This selects the method to use for the standard check. Possible values are
+# zlib, pigz, and zcat. Possible errors encountered when using zlib and pigz
+# will be re-checked using zcat
+check_method="zlib"
 
 # Script:
 # -------
@@ -57,16 +61,23 @@ while [ $i -le $dir_run ]; do
       continue
     fi
     #echo "f: ""$filename"
-    checksum=$(zlib-flate -uncompress < "$file" | md5sum -b | cut -d' ' -f1)
-    #checksum=$(pigz -dc "$file" | md5sum -b | cut -d' ' -f1)
-    #checksum=$(/usr/local/BackupPC/bin/BackupPC_zcat "$file" | md5sum -b | cut -d' ' -f1)
+    if [ "$check_method" == "zcat" ]; then
+      checksum=$(/usr/local/BackupPC/bin/BackupPC_zcat "$file" | md5sum -b | cut -d' ' -f1)
+    else
+      if [ "$check_method" == "pigz" ]; then
+        checksum=$(pigz -dc "$file" | md5sum -b | cut -d' ' -f1)
+      else
+        checksum=$(zlib-flate -uncompress < "$file" | md5sum -b | cut -d' ' -f1)
+      fi
+      #echo "c: ""$checksum"
+      if [ "$checksum" != "$filename" ]; then
+        echo "ZLIB/PIGZ ERROR: ""$filename"" -> ""$checksum"
+        checksum=$(/usr/local/BackupPC/bin/BackupPC_zcat "$file" | md5sum -b | cut -d' ' -f1)
+      fi
+    fi
     #echo "c: ""$checksum"
     if [ "$checksum" != "$filename" ]; then
-      echo "ZLIB/PIGZ ERROR: ""$filename"" -> ""$checksum"
-      checksum=$(/usr/local/BackupPC/bin/BackupPC_zcat "$file" | md5sum -b | cut -d' ' -f1)
-      if [ "$checksum" != "$filename" ]; then
-        echo "CHECKSUM ERROR: ""$filename"" -> ""$checksum"
-      fi
+      echo "CHECKSUM ERROR: ""$filename"" -> ""$checksum"
     fi
   done
   echo "$dir_num" > "$dir_file"
