@@ -1,17 +1,17 @@
 # Description
 
-This is a helper Bash script to verify the checksum of files in a [BackupPC V4](https://backuppc.github.io/backuppc/) installation. The latest version of the script can be found at [github.com/guille2306/backuppc_check_pool](https://github.com/guille2306/backuppc_check_pool).
+This is a helper Bash script to verify the checksum of files in a [BackupPC V4](https://backuppc.github.io/backuppc/) installation.
+The latest version of the script can be found at [github.com/guille2306/backuppc_check_pool](https://github.com/guille2306/backuppc_check_pool).
 
 ## The problem
 
-On BackupPC V4 and later the files are saved in the pool using their full-file MD5 hash
-as filename.
+On BackupPC V4 and later the files are saved in the pool using their full-file MD5 hash as filename.
 Using the [_--checksum_ argument](https://backuppc.github.io/backuppc/BackupPC.html#_conf_rsyncfullargsextra_) (typically during full backups) causes the client to send the full-file checksum for every file.
 On the server, _rsync_bpc_ will skip any files that have a matching full-file checksum and metadata (size, mtime and number of hardlinks).
 
-The server load is very low, since both the metadata and the full-file checksum are stored and easily accessed without needing to look at the file contents at all.
-However, there is a catch: if you rely on the checksums saved in the server, BackupPC will not check again unmodified pool files.
-This risks it missing file system corruption or bit rot in the backup files.
+Since both the metadata and the full-file checksum are stored and easily accessed without needing to look at the file contents, the server load is very low.
+However, there is a catch: as it relies on the saved checksums, BackupPC will not check again unmodified pool files in the server.
+This risks it missing errors due ro file system corruption or bit rot in the backup files.
 
 Two possible solutions to verify the integrity of the pool are:
 
@@ -50,19 +50,26 @@ It also has some disadvantages:
 
 # Use
 
-To start a check run the script as the _backuppc_ user. The configuration is simple:
+To start a check run the script as the _backuppc_ user, ideally with a cron job.
+The configuration is simple:
 
-- _dir_file_ is an external file that saves the last sub-folder of the cpool that was checked by the script. It must be initialized before the first run, usually to "00".
+- _dir_file_ is an external file that saves the last sub-folder of the cpool that was checked by the script.
+It must be initialized before the first run, usually to "00".
 
-- _dir_base_ is the base folder for the cpool files. The script will check the files located at "$base_pool_folder/cpool".
+- _dir_base_ is the base folder for the cpool files.
+The script will check the files located at "$base_pool_folder/cpool".
 
-- _dir_run_ is the number of sub-folders the script will check during each run. By default the script checks 4 sub-folders per run, so it takes 32 days to sequentially check the full pool.
+- _dir_run_ is the number of sub-folders the script will check during each run.
+By default the script checks 4 sub-folders per run, so it takes 32 days to sequentially check the full pool.
 
-- _check_method_ selects the method to use for the standard check. Possible values are zlib, pigz, and zcat. Possible errors encountered when using zlib and pigz will be re-checked using BackupPC_zcat.
+- _check_method_ selects the method to use for the standard check.
+Possible values are zlib, pigz, and zcat.
+Possible errors encountered when using zlib and pigz will be re-checked using BackupPC_zcat.
 
 # Thanks
 
-To Alexander Kobel that originally [gave me the idea](https://sourceforge.net/p/backuppc/mailman/message/36379588/) of the script. To Craig Barratt for the great piece of software that is [BackupPC](https://backuppc.github.io/backuppc/).
+To Alexander Kobel that originally [gave me the idea](https://sourceforge.net/p/backuppc/mailman/message/36379588/) of the script.
+To Craig Barratt for the great piece of software that is [BackupPC](https://backuppc.github.io/backuppc/).
 
 # Copyright
 
