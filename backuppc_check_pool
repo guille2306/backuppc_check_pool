@@ -20,12 +20,24 @@
 # along with this program (see the COPYING file). If not, see
 # https://www.gnu.org/licenses/.
 
+# Options:
+# -------
+# This is an external file that saves the last sub-folder of the cpool that was
+# checked by the script. It must be initialized before the first run, usually
+# to "00".
 dir_file="last_check_dir_file"
+# This is the base folder for the cpool files. The script will check files
+# located at "$base_pool_folder/cpool"
+dir_base="base_pool_folder"
+# This is the number of sub-folders the script should check during each run
+dir_run=4
+
+# Script:
+# -------
 dir_num=$(cat "$dir_file")
 #echo "$dir_num"
-
-#for i in 1 2; do
-for i in {1..4..1}; do
+i=1
+while [ $i -le $dir_run ]; do
   dir_num=$(echo "obase=16;ibase=16; $dir_num + 2" | bc)
   if [ "$dir_num" == "100" ]; then
     dir_num="00"
@@ -33,7 +45,7 @@ for i in {1..4..1}; do
   if [ "${#dir_num}" -eq 1 ]; then
     dir_num="0""$dir_num"
   fi
-  dir="/mnt/BACKUPPC/cpool/""$(echo $dir_num | tr '[:upper:]' '[:lower:]')"
+  dir="$dir_base""/cpool/""$(echo $dir_num | tr '[:upper:]' '[:lower:]')"
   #echo "$dir_num"
   echo ""
   date
@@ -47,7 +59,7 @@ for i in {1..4..1}; do
     #echo "f: ""$filename"
     checksum=$(zlib-flate -uncompress < "$file" | md5sum -b | cut -d' ' -f1)
     #checksum=$(pigz -dc "$file" | md5sum -b | cut -d' ' -f1)
-    #checksum=$(sudo -u backuppc /usr/local/BackupPC/bin/BackupPC_zcat "$file" | md5sum -b | cut -d' ' -f1)
+    #checksum=$(/usr/local/BackupPC/bin/BackupPC_zcat "$file" | md5sum -b | cut -d' ' -f1)
     #echo "c: ""$checksum"
     if [ "$checksum" != "$filename" ]; then
       echo "ZLIB/PIGZ ERROR: ""$filename"" -> ""$checksum"
@@ -58,4 +70,5 @@ for i in {1..4..1}; do
     fi
   done
   echo "$dir_num" > "$dir_file"
+  i=$(($i+1))
 done
