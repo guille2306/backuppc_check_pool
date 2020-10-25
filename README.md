@@ -50,13 +50,15 @@ It also has some disadvantages:
 
 # Use
 
-To start a check simply run the script as a user that has read-access to the cpool folder.
-The configuration is simple:
+To start a check run the script as the _backuppc_ user. The configuration is simple:
 
-- the last checked sub-folder of the cpool is saved in the _dir_file_ auxiliary file. This file must be initialized (usually to "00") before the first run.
+- _dir_file_ is an external file that saves the last sub-folder of the cpool that was checked by the script. It must be initialized before the first run, usually to "00".
 
-- by default the script checks 4 sub-folders per run, so it takes 32 days to sequentially check the full pool. This can be modified by changing the external
-_for_ loop.
+- _dir_base_ is the base folder for the cpool files. The script will check the files located at "$base_pool_folder/cpool".
+
+- _dir_run_ is the number of sub-folders the script will check during each run. By default the script checks 4 sub-folders per run, so it takes 32 days to sequentially check the full pool.
+
+- _check_method_ selects the method to use for the standard check. Possible values are zlib, pigz, and zcat. Possible errors encountered when using zlib and pigz will be re-checked using BackupPC_zcat.
 
 # Thanks
 
