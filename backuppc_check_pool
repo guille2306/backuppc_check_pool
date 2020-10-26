@@ -49,7 +49,7 @@ while [ $i -le $dir_run ]; do
     fi
     #echo "f: ""$filename"
     if [ "$check_method" == "zcat" ]; then
-      checksum=$(/usr/local/BackupPC/bin/BackupPC_zcat "$file" | md5sum -b | cut -d' ' -f1)
+      checksum=$("$bpc_bin_dir"/BackupPC_zcat "$file" | md5sum -b | cut -d' ' -f1)
     else
       if [ "$check_method" == "pigz" ]; then
         checksum=$(pigz -dc "$file" | md5sum -b | cut -d' ' -f1)
@@ -59,7 +59,7 @@ while [ $i -le $dir_run ]; do
       #echo "c: ""$checksum"
       if [ "$checksum" != "$filename" ]; then
         echo "ZLIB/PIGZ ERROR: ""$filename"" -> ""$checksum"
-        checksum=$(/usr/local/BackupPC/bin/BackupPC_zcat "$file" | md5sum -b | cut -d' ' -f1)
+        checksum=$("$bpc_bin_dir"/BackupPC_zcat "$file" | md5sum -b | cut -d' ' -f1)
       fi
     fi
     #echo "c: ""$checksum"
