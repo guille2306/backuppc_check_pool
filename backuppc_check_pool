@@ -21,7 +21,7 @@
 # https://www.gnu.org/licenses/.
 
 # Options are now in an external file
-source /etc/conf.d/bpc-check-pool
+source ./default.conf
 
 # Script:
 # -------
