@@ -20,21 +20,8 @@
 # along with this program (see the COPYING file). If not, see
 # https://www.gnu.org/licenses/.
 
-# Options:
-# -------
-# This is an external file that saves the last sub-folder of the cpool that was
-# checked by the script. It must be initialized before the first run, usually
-# to "00".
-dir_file="last_check_dir_file"
-# This is the base folder for the cpool files. The script will check the files
-# located at "$base_pool_folder/cpool"
-dir_base="base_pool_folder"
-# This is the number of sub-folders the script will check during each run
-dir_run=4
-# This selects the method to use for the standard check. Possible values are
-# zlib, pigz, and zcat. Possible errors encountered when using zlib and pigz
-# will be re-checked using zcat
-check_method="zlib"
+# Options are now in an external file
+source $(dirname $0)/default.conf
 
 # Script:
 # -------
@@ -62,7 +49,7 @@ while [ $i -le $dir_run ]; do
     fi
     #echo "f: ""$filename"
     if [ "$check_method" == "zcat" ]; then
-      checksum=$(/usr/local/BackupPC/bin/BackupPC_zcat "$file" | md5sum -b | cut -d' ' -f1)
+      checksum=$("$bpc_bin_dir"/BackupPC_zcat "$file" | md5sum -b | cut -d' ' -f1)
     else
       if [ "$check_method" == "pigz" ]; then
         checksum=$(pigz -dc "$file" | md5sum -b | cut -d' ' -f1)
@@ -72,7 +59,7 @@ while [ $i -le $dir_run ]; do
       #echo "c: ""$checksum"
       if [ "$checksum" != "$filename" ]; then
         echo "ZLIB/PIGZ ERROR: ""$filename"" -> ""$checksum"
-        checksum=$(/usr/local/BackupPC/bin/BackupPC_zcat "$file" | md5sum -b | cut -d' ' -f1)
+        checksum=$("$bpc_bin_dir"/BackupPC_zcat "$file" | md5sum -b | cut -d' ' -f1)
       fi
     fi
     #echo "c: ""$checksum"
